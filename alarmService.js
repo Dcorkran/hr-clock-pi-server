@@ -28,6 +28,8 @@ websocket.on('connection', (socket) => {
     .then((data)=>{
       var dateObj = parsedDate.formatDate(data.alarm);
       j = schedule.scheduleJob(`${dateObj.minute} ${dateObj.hour} ${dateObj.day} ${dateObj.month} *`, function(){
+        console.log('hi');
+        socket.emit('hi','hi');
         beep = alarm.alarmOn();
       });
       console.log(data.alarm);
@@ -52,6 +54,13 @@ app.get('/unlock', function(req, res){
      noble.stopScanning();
    }
  });
+
+ websocket.sockets.emit('hi','hi');
+  websocket.on('hi',function(){
+    console.log('hi');
+  })
+
+
 
  noble.on('discover', function(peripheral) {
    console.log(peripheral.advertisement.localName);
@@ -79,6 +88,8 @@ app.get('/unlock', function(req, res){
              // Measurement docs here: https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml
              console.log('data is: ' + data[1]);
              console.log(i);
+             websocket.sockets.emit('beep',data[1]);
+
              if (data[1] >= 100) {
                i++;
              }
